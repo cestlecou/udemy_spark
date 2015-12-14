@@ -1,2 +1,4 @@
 *.pyc
 ml-100k/*
+*.csv
+*.txt
