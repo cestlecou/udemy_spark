@@ -2,8 +2,8 @@
 
 Base version has the following additions (exercises in Lecture 31):
 
-* discard bad ratings TODO
-* implemented Pearson correlation, Jaccard coefficient, conditional probabilty TODO
+* discard bad ratings DONE
+* implemented Pearson correlation, Jaccard coefficient (DONE), conditional probabilty TODO
 * new similarity using number of co-raters TODO
 * use genre info from u.items to boost scores from movies in same genre TODO
 """
@@ -29,6 +29,9 @@ def filterDuplicates( (userID, ratings) ):
     (movie1, rating1) = ratings[0]
     (movie2, rating2) = ratings[1]
     return movie1 < movie2
+
+def filterLowRating( (userID, (movieID, rating)) ):
+    return rating >= 3
 
 def computeCosineSimilarity(ratingPairs):
     numPairs = 0
@@ -108,6 +111,9 @@ data = sc.textFile("file:///SparkCourse/ml-100k/u.data")
 # Map ratings to key / value pairs: user ID => movie ID, rating
 ratings = data.map(lambda l: l.split()).map(lambda l: (int(l[0]), (int(l[1]), float(l[2]))))
 
+#filter out bad ratings - must give rating of 3 or over
+ratings = ratings.filter(filterLowRating)
+
 # Emit every movie rated together by the same user.
 # Self-join to find every combination.
 joinedRatings = ratings.join(ratings)
@@ -135,7 +141,8 @@ moviePairSimilarities = moviePairRatings.mapValues(computeJaccardCoefficient).ca
 # Extract similarities for the movie we care about that are "good".
 if (len(sys.argv) > 1):
 
-    scoreThreshold = 0.97
+    #reduce threshold for jaccard metric
+    scoreThreshold = 0.01  #0.97
     coOccurenceThreshold = 50
 
     movieID = int(sys.argv[1])
