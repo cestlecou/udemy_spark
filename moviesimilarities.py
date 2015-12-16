@@ -48,6 +48,32 @@ def computeCosineSimilarity(ratingPairs):
 
     return (score, numPairs)
 
+def computePearsonCorrelationCoefficient(ratingPairs):
+    numPairs = 0
+    if not ratingPairs:
+        return (0, 0)
+
+    muX = sum(1.*ratingX for (ratingX, _) in ratingPairs)/len(ratingPairs)
+    muY = sum(1.*ratingY for (_, ratingY) in ratingPairs)/len(ratingPairs)
+
+    cov = sum_sqdev_x = sum_sqdev_y = 0
+    for ratingX, ratingY in ratingPairs:
+        dev_x = ratingX - muX
+        dev_y = ratingY - muY
+        cov += dev_x * dev_y
+        sum_sqdev_x += dev_x**2
+        sum_sqdev_y += dev_y**2
+        numPairs += 1
+
+    numerator = cov
+    denominator = sqrt(sum_sqdev_x) * sqrt(sum_sqdev_y)
+
+    score = 0
+    if (denominator):
+        score = (numerator / (float(denominator)))
+
+    return (score, numPairs)
+
 #laptop doesn't like using both cores...
 #conf = SparkConf().setMaster("local[*]").setAppName("MovieSimilarities")
 conf = SparkConf().setMaster("local").setAppName("MovieSimilarities")
