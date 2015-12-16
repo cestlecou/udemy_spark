@@ -74,6 +74,27 @@ def computePearsonCorrelationCoefficient(ratingPairs):
 
     return (score, numPairs)
 
+def computeJaccardCoefficient(ratingPairs):
+    """Compute Jaccard coefficient for ratings of pair of movies.
+
+    See https://en.wikipedia.org/wiki/Jaccard_index. In what proportion of cases
+    did the user rate both movies the same.
+    """
+    numerator = denominator = 0
+    for ratingX, ratingY in ratingPairs:
+        if ratingX == ratingY:
+            numerator += 1
+            denominator += 1
+        else:
+            denominator += 1
+        numPairs += 1
+
+    score = 0
+    if (denominator):
+        score = (numerator / (float(denominator)))
+
+    return (score, numPairs)
+
 #laptop doesn't like using both cores...
 #conf = SparkConf().setMaster("local[*]").setAppName("MovieSimilarities")
 conf = SparkConf().setMaster("local").setAppName("MovieSimilarities")
@@ -105,7 +126,7 @@ moviePairRatings = moviePairs.groupByKey()
 
 # We now have (movie1, movie2) = > (rating1, rating2), (rating1, rating2) ...
 # Can now compute similarities.
-moviePairSimilarities = moviePairRatings.mapValues(computeCosineSimilarity).cache()
+moviePairSimilarities = moviePairRatings.mapValues(computeJaccardCoefficient).cache()
 
 # Save the results if desired
 #moviePairSimilarities.sortByKey()
