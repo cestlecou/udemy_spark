@@ -80,7 +80,7 @@ def computeJaccardCoefficient(ratingPairs):
     See https://en.wikipedia.org/wiki/Jaccard_index. In what proportion of cases
     did the user rate both movies the same.
     """
-    numerator = denominator = 0
+    numPairs = numerator = denominator = 0
     for ratingX, ratingY in ratingPairs:
         if ratingX == ratingY:
             numerator += 1
